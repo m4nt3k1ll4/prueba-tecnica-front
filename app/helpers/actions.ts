@@ -32,13 +32,13 @@ export async function authenticate() {
 }
 
 export async function logOut() {
-  await signOut({ redirectTo: "/" });
+  await signOut({ redirect: true, redirectTo: "/" });
 }
 
 /** Obtiene el admin token de la session actual o lanza error */
 async function requireAdminToken(): Promise<string> {
   const session = await auth();
-  if (!session?.user?.isAdmin || !session.user.adminToken) {
+  if ((!session?.user?.isAdmin && !session?.user?.isInterviewer) || !session?.user?.adminToken) {
     throw new Error("Acceso denegado: se requiere token de administrador.");
   }
   return session.user.adminToken;
@@ -269,6 +269,17 @@ export async function createPurchaseAction(
 
     // 2. Registrar compra en la base de datos del frontend (Prisma) para historial del usuario
     const backendPurchase = res.data;
+
+    // Asegurar que el usuario exista en la BD local (Credentials login no crea registro vía PrismaAdapter)
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: {},
+      create: {
+        id: userId,
+        email: userEmail,
+        name: userName,
+      },
+    });
     
     // Calcular total
     const total = backendPurchase.items?.reduce(
