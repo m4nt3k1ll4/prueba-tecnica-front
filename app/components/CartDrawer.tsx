@@ -58,7 +58,7 @@ export function CartDrawer() {
       {/* Drawer */}
       <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-zinc-800 bg-zinc-900 shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-4 sm:px-6">
           <div className="flex items-center gap-2">
             <FiShoppingCart className="h-5 w-5 text-indigo-400" />
             <h2 className="text-lg font-semibold text-zinc-100">Carrito</h2>
@@ -75,7 +75,7 @@ export function CartDrawer() {
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
               <FiShoppingCart className="mb-3 h-12 w-12" />
@@ -152,7 +152,7 @@ export function CartDrawer() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-zinc-800 px-6 py-4 space-y-3">
+          <div className="border-t border-zinc-800 px-4 py-4 space-y-3 sm:px-6">
             {message && (
               <div
                 className={`rounded-lg px-3 py-2 text-sm ${

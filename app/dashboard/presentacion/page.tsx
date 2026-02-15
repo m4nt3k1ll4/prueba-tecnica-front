@@ -253,7 +253,7 @@ export default async function PresentacionPage() {
       {/* ─── Header ─── */}
       <div>
         <h1
-          className={`${bebasNeue.className} text-4xl tracking-wider sm:text-5xl`}
+          className={`${bebasNeue.className} text-3xl tracking-wider sm:text-4xl md:text-5xl`}
         >
           Presentación del Proyecto
         </h1>

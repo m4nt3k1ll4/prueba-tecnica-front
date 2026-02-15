@@ -24,13 +24,13 @@ function PurchaseCard({ purchase }: { purchase: Purchase }) {
     <div className="rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between p-4 text-left hover:bg-zinc-800/50 transition-colors cursor-pointer"
+        className="flex w-full items-center justify-between gap-2 p-3 text-left hover:bg-zinc-800/50 transition-colors cursor-pointer sm:p-4"
       >
-        <div className="flex items-center gap-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600/20">
-            <FiPackage className="h-5 w-5 text-indigo-400" />
+        <div className="flex items-center gap-3 min-w-0 sm:gap-4">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600/20 sm:h-10 sm:w-10">
+            <FiPackage className="h-4 w-4 text-indigo-400 sm:h-5 sm:w-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-medium text-zinc-200">
               Compra #{purchase.id}
             </p>
@@ -40,55 +40,57 @@ function PurchaseCard({ purchase }: { purchase: Purchase }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <span
-            className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+            className={`hidden rounded-full border px-2.5 py-0.5 text-xs font-medium sm:inline-block ${
               statusColors[purchase.status] || "bg-zinc-800 text-zinc-400 border-zinc-700"
             }`}
           >
             {statusLabels[purchase.status] || purchase.status}
           </span>
-          <span className="text-sm font-semibold text-emerald-400">
+          <span className="text-sm font-semibold text-emerald-400 whitespace-nowrap">
             {formatCurrency(Number(purchase.total))}
           </span>
           {expanded ? (
-            <FiChevronUp className="h-5 w-5 text-zinc-500" />
+            <FiChevronUp className="h-4 w-4 text-zinc-500 sm:h-5 sm:w-5" />
           ) : (
-            <FiChevronDown className="h-5 w-5 text-zinc-500" />
+            <FiChevronDown className="h-4 w-4 text-zinc-500 sm:h-5 sm:w-5" />
           )}
         </div>
       </button>
 
       {expanded && purchase.items && (
-        <div className="border-t border-zinc-800 bg-zinc-950 p-4">
-          <table className="w-full">
-            <thead>
-              <tr className="text-xs text-zinc-500">
-                <th className="pb-2 text-left font-medium">Producto</th>
-                <th className="pb-2 text-center font-medium">Cantidad</th>
-                <th className="pb-2 text-right font-medium">P. Unitario</th>
-                <th className="pb-2 text-right font-medium">Subtotal</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
-              {purchase.items.map((item) => (
-                <tr key={item.id} className="border-t border-zinc-800/50">
-                  <td className="py-2 text-zinc-300">
-                    {item.product?.name || `Producto #${item.product_id}`}
-                  </td>
-                  <td className="py-2 text-center text-zinc-400">
-                    {item.quantity}
-                  </td>
-                  <td className="py-2 text-right text-zinc-400">
-                    {formatCurrency(Number(item.unit_price))}
-                  </td>
-                  <td className="py-2 text-right font-medium text-emerald-400">
-                    {formatCurrency(Number(item.subtotal))}
-                  </td>
+        <div className="border-t border-zinc-800 bg-zinc-950 p-3 sm:p-4">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-75">
+              <thead>
+                <tr className="text-xs text-zinc-500">
+                  <th className="pb-2 text-left font-medium">Producto</th>
+                  <th className="pb-2 text-center font-medium">Cant.</th>
+                  <th className="pb-2 text-right font-medium">P. Unit.</th>
+                  <th className="pb-2 text-right font-medium">Subtotal</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="text-sm">
+                {purchase.items.map((item) => (
+                  <tr key={item.id} className="border-t border-zinc-800/50">
+                    <td className="py-2 text-zinc-300 max-w-30 truncate">
+                      {item.product?.name || `Producto #${item.product_id}`}
+                    </td>
+                    <td className="py-2 text-center text-zinc-400">
+                      {item.quantity}
+                    </td>
+                    <td className="py-2 text-right text-zinc-400">
+                      {formatCurrency(Number(item.unit_price))}
+                    </td>
+                    <td className="py-2 text-right font-medium text-emerald-400">
+                      {formatCurrency(Number(item.subtotal))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

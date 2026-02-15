@@ -84,10 +84,10 @@ export default function Home() {
       <Header />
 
       {/* ─── Hero / About Me ─── */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pt-16">
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 pt-16 sm:px-6">
         {/* Background gradient */}
         <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-indigo-950/30 via-black to-black" />
-        <div className="pointer-events-none absolute top-1/4 left-1/2 h-150 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/10 blur-[120px]" />
+        <div className="pointer-events-none absolute top-1/4 left-1/2 h-[80vw] w-[80vw] max-h-150 max-w-150 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/10 blur-[120px]" />
 
         <div className="relative z-10 mx-auto max-w-4xl text-center">
           {/* Badge */}
@@ -97,7 +97,7 @@ export default function Home() {
           </div>
 
           <h1
-            className={`${bebasNeue.className} mb-4 text-5xl leading-tight tracking-wider sm:text-6xl md:text-8xl`}
+            className={`${bebasNeue.className} mb-4 text-3xl leading-tight tracking-wider sm:text-5xl md:text-8xl`}
           >
             {profile.name}
           </h1>
@@ -151,7 +151,7 @@ export default function Home() {
       </section>
 
       {/* ─── Tech Stack ─── */}
-      <section id="stack" className="relative px-6 py-32">
+      <section id="stack" className="relative px-4 py-16 sm:px-6 sm:py-32">
         <div className="mx-auto max-w-6xl">
           <div className="mb-16 text-center">
             <h2
@@ -184,7 +184,7 @@ export default function Home() {
       </section>
 
       {/* ─── Features ─── */}
-      <section id="features" className="relative border-t border-zinc-800 px-6 py-32">
+      <section id="features" className="relative border-t border-zinc-800 px-4 py-16 sm:px-6 sm:py-32">
         <div className="mx-auto max-w-6xl">
           <div className="mb-16 text-center">
             <h2
@@ -217,7 +217,7 @@ export default function Home() {
       </section>
 
       {/* ─── AI Tools ─── */}
-      <section className="border-t border-zinc-800 px-6 py-24">
+      <section className="border-t border-zinc-800 px-4 py-16 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="mb-12 text-center">
             <h2
@@ -246,7 +246,7 @@ export default function Home() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="border-t border-zinc-800 px-6 py-24">
+      <section className="border-t border-zinc-800 px-4 py-16 sm:px-6 sm:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <h2
             className={`${bebasNeue.className} mb-4 text-4xl tracking-wider sm:text-5xl`}
@@ -268,7 +268,7 @@ export default function Home() {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="border-t border-zinc-800 px-6 py-8">
+      <footer className="border-t border-zinc-800 px-4 py-8 sm:px-6">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-zinc-500 sm:flex-row">
           <span>© 2026 {profile.name}. Proyecto Full-Stack.</span>
           <div className="flex items-center gap-4">

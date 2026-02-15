@@ -31,18 +31,19 @@ export function SalesTable({ purchases }: { purchases: Purchase[] }) {
 
   return (
     <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-      <table className="w-full">
-        <thead>
-          <tr className="border-b border-zinc-800 text-xs uppercase tracking-wider text-zinc-500">
-            <th className="px-4 py-3 text-left font-medium">ID</th>
-            <th className="px-4 py-3 text-left font-medium">Cliente</th>
-            <th className="px-4 py-3 text-center font-medium">Items</th>
-            <th className="px-4 py-3 text-right font-medium">Total</th>
-            <th className="px-4 py-3 text-center font-medium">Estado</th>
-            <th className="px-4 py-3 text-right font-medium">Fecha</th>
-            <th className="px-4 py-3 text-center font-medium">Detalle</th>
-          </tr>
-        </thead>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-160">
+          <thead>
+            <tr className="border-b border-zinc-800 text-xs uppercase tracking-wider text-zinc-500">
+              <th className="px-3 py-3 text-left font-medium sm:px-4">ID</th>
+              <th className="px-3 py-3 text-left font-medium sm:px-4">Cliente</th>
+              <th className="px-3 py-3 text-center font-medium sm:px-4">Items</th>
+              <th className="px-3 py-3 text-right font-medium sm:px-4">Total</th>
+              <th className="px-3 py-3 text-center font-medium sm:px-4">Estado</th>
+              <th className="px-3 py-3 text-right font-medium sm:px-4 hidden sm:table-cell">Fecha</th>
+              <th className="px-3 py-3 text-center font-medium sm:px-4">Detalle</th>
+            </tr>
+          </thead>
         <tbody>
           {purchases.map((purchase) => (
             <Fragment key={purchase.id}>
@@ -75,7 +76,7 @@ export function SalesTable({ purchases }: { purchases: Purchase[] }) {
                     {statusLabels[purchase.status] || purchase.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right text-sm text-zinc-400">
+                <td className="px-3 py-3 text-right text-sm text-zinc-400 hidden sm:table-cell sm:px-4">
                   {formatDate(purchase.created_at)}
                 </td>
                 <td className="px-4 py-3 text-center">
@@ -95,42 +96,45 @@ export function SalesTable({ purchases }: { purchases: Purchase[] }) {
               </tr>
               {expandedId === purchase.id && purchase.items && (
                 <tr key={`${purchase.id}-detail`}>
-                  <td colSpan={7} className="bg-zinc-950 px-6 py-3">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="text-xs text-zinc-500">
-                          <th className="pb-2 text-left font-medium">Producto</th>
-                          <th className="pb-2 text-center font-medium">Cantidad</th>
-                          <th className="pb-2 text-right font-medium">P. Unitario</th>
-                          <th className="pb-2 text-right font-medium">Subtotal</th>
-                        </tr>
-                      </thead>
-                      <tbody className="text-sm">
-                        {purchase.items.map((item) => (
-                          <tr key={item.id} className="border-t border-zinc-800/50">
-                            <td className="py-2 text-zinc-300">
-                              {item.product?.name || `Producto #${item.product_id}`}
-                            </td>
-                            <td className="py-2 text-center text-zinc-400">
-                              {item.quantity}
-                            </td>
-                            <td className="py-2 text-right text-zinc-400">
-                              {formatCurrency(Number(item.unit_price))}
-                            </td>
-                            <td className="py-2 text-right font-medium text-emerald-400">
-                              {formatCurrency(Number(item.subtotal))}
-                            </td>
+                  <td colSpan={7} className="bg-zinc-950 px-3 py-3 sm:px-6">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[320px]">
+                        <thead>
+                          <tr className="text-xs text-zinc-500">
+                            <th className="pb-2 text-left font-medium">Producto</th>
+                            <th className="pb-2 text-center font-medium">Cant.</th>
+                            <th className="pb-2 text-right font-medium">P. Unit.</th>
+                            <th className="pb-2 text-right font-medium">Subtotal</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="text-sm">
+                          {purchase.items.map((item) => (
+                            <tr key={item.id} className="border-t border-zinc-800/50">
+                              <td className="py-2 text-zinc-300 max-w-30 truncate">
+                                {item.product?.name || `Producto #${item.product_id}`}
+                              </td>
+                              <td className="py-2 text-center text-zinc-400">
+                                {item.quantity}
+                              </td>
+                              <td className="py-2 text-right text-zinc-400">
+                                {formatCurrency(Number(item.unit_price))}
+                              </td>
+                              <td className="py-2 text-right font-medium text-emerald-400">
+                                {formatCurrency(Number(item.subtotal))}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </td>
                 </tr>
               )}
             </Fragment>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 }

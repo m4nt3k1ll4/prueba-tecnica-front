@@ -9,7 +9,7 @@ export function CartButton() {
   return (
     <button
       onClick={() => setIsOpen(true)}
-      className="relative rounded-lg bg-zinc-800 p-2.5 text-zinc-400 hover:bg-zinc-700 hover:text-white transition-colors cursor-pointer"
+      className="relative flex h-12 w-12 items-center justify-center rounded-full bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white transition-colors shadow-lg cursor-pointer"
       aria-label="Abrir carrito"
     >
       <FiShoppingCart className="h-5 w-5" />

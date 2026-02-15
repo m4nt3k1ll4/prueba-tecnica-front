@@ -8,7 +8,6 @@ import {
   updateProduct as apiUpdateProduct,
   deleteProduct as apiDeleteProduct,
   generateProductDescription as apiGenerateDescription,
-  fetchProductById as apiFetchProductById,
   adminApproveUser,
   adminRevokeUser,
   adminDeleteUser,
@@ -21,7 +20,9 @@ import {
   fetchAllStocks as apiFetchAllStocks,
   fetchProducts as apiFetchProducts,
   fetchStockByProduct as apiFetchStockByProduct,
+  sendAIPrompt,
 } from "@/app/helpers/api";
+import type { Product } from "@/app/types";
 
 // ============================================================
 // Auth actions
@@ -546,6 +547,124 @@ export async function fetchStockByProductAction(productId: number) {
       success: false,
       message: e instanceof Error ? e.message : "Error al verificar stock.",
       data: null,
+    };
+  }
+}
+
+// ============================================================
+// AI Shopping Assistant
+// ============================================================
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+  products?: Product[];
+}
+
+export async function chatAssistantAction(
+  messages: { role: "user" | "assistant"; content: string }[]
+): Promise<{
+  success: boolean;
+  message: string;
+  products?: Product[];
+}> {
+  try {
+    // Fetch current product catalog (limited to 15 for prompt size)
+    const productsRes = await apiFetchProducts({ per_page: 15 });
+    console.log("Productos obtenidos:", productsRes.data?.length || 0);
+    
+    const products = productsRes.data ?? [];
+
+    if (!products || products.length === 0) {
+      console.warn("No hay productos disponibles");
+      return {
+        success: false,
+        message: "No hay productos disponibles en este momento. Por favor, intenta más tarde.",
+      };
+    }
+
+    // Build a VERY compact catalog for the prompt
+    const productCatalog = products.map((p) => `${p.id}:${p.name} $${p.price}`).join(', ');
+
+    const systemPrompt = `Eres un asistente de compras. Ayuda al cliente a encontrar productos.
+
+Catálogo (${products.length}): ${productCatalog}
+
+IMPORTANTE: 
+- Responde SOLAMENTE con JSON válido, SIN markdown, SIN backticks, SIN código. Solo el objeto JSON puro.
+- Cuando recomiendes productos, termina tu mensaje con "Haz clic en el botón del carrito para agregarlo."
+Formato: {"message":"tu respuesta aquí","recommended_product_ids":[1,2,3]}`;
+
+    const conversationText = messages
+      .slice(-4) // Only last 4 messages
+      .map((m) => `${m.role === "user" ? "C" : "A"}: ${m.content}`)
+      .join("\n");
+
+    const fullPrompt = `${systemPrompt}\n\n${conversationText}\n\nRespuesta (solo JSON, sin markdown):`;
+    
+    console.log("Tamaño del prompt:", fullPrompt.length, "caracteres");
+
+    const res = await sendAIPrompt({
+      prompt: fullPrompt,
+      temperature: 0.7,
+      max_tokens: 600,
+    });
+
+    if (!res.success || !res.data) {
+      console.error("Error en respuesta de AI:", res);
+      return {
+        success: false,
+        message: res.message || "Error al comunicarse con el asistente.",
+      };
+    }
+
+    let aiResponse = res.data.response;
+    console.log("Respuesta de IA:", aiResponse);
+
+    // Remove markdown code blocks if present (```json ... ```)
+    aiResponse = aiResponse.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
+
+    // Try to parse the JSON response
+    try {
+      // Extract JSON from the response
+      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.warn("No se encontró JSON en la respuesta, usando texto plano");
+        return {
+          success: true,
+          message: aiResponse,
+          products: undefined,
+        };
+      }
+
+      const jsonStr = jsonMatch[0];
+      const parsed = JSON.parse(jsonStr);
+
+      const recommendedIds: number[] = parsed.recommended_product_ids || [];
+      const recommendedProducts = products.filter((p) =>
+        recommendedIds.includes(p.id)
+      );
+
+      return {
+        success: true,
+        message: parsed.message || aiResponse,
+        products: recommendedProducts.length > 0 ? recommendedProducts : undefined,
+      };
+    } catch (parseError) {
+      // If JSON parsing fails, return the raw text
+      console.error("Error al parsear JSON de IA:", parseError);
+      console.log("Respuesta original:", aiResponse);
+      return {
+        success: true,
+        message: aiResponse,
+        products: undefined,
+      };
+    }
+  } catch (e) {
+    console.error("Error en chatAssistantAction:", e);
+    return {
+      success: false,
+      message: "Error al comunicarse con el asistente. Inténtalo de nuevo.",
     };
   }
 }

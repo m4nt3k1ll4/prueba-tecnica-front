@@ -18,7 +18,7 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <div>
         <h1
-          className={`${bebasNeue.className} text-4xl tracking-wider text-zinc-100`}
+          className={`${bebasNeue.className} text-3xl tracking-wider text-zinc-100 sm:text-4xl`}
         >
           Dashboard
         </h1>

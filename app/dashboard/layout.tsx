@@ -1,6 +1,7 @@
 import { auth } from "@/app/auth";
 import { redirect } from "next/navigation";
 import { SideNav } from "@/app/components/SideNav";
+import { MobileNav } from "@/app/components/MobileNav";
 import { TokenRefresher } from "@/app/components/TokenRefresher";
 import { CartWrapper } from "@/app/components/CartWrapper";
 
@@ -20,7 +21,10 @@ export default async function DashboardLayout({
       {/* Refresh admin token cada 4.5 min */}
       <TokenRefresher />
 
-      {/* Sidebar */}
+      {/* Mobile navigation drawer (visible below md) */}
+      <MobileNav />
+
+      {/* Sidebar — desktop only */}
       <aside className="hidden w-64 shrink-0 md:block">
         <div className="sticky top-0 h-screen">
           <SideNav />
@@ -29,7 +33,7 @@ export default async function DashboardLayout({
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 pt-16 pb-8 md:pt-8 sm:px-6 lg:px-8">
           <CartWrapper>
             {children}
           </CartWrapper>

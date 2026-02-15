@@ -15,7 +15,7 @@ export default async function ApiDocsPage() {
       {/* ── Header ── */}
       <div>
         <h1
-          className={`${bebasNeue.className} text-4xl md:text-5xl text-zinc-100`}
+          className={`${bebasNeue.className} text-3xl sm:text-4xl md:text-5xl text-zinc-100`}
         >
           Documentación de la API
         </h1>

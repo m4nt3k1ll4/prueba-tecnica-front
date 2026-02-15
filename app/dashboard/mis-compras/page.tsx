@@ -32,7 +32,7 @@ export default async function MisComprasPage(props: {
     <div className="space-y-6">
       <div>
         <h1
-          className={`${bebasNeue.className} text-4xl tracking-wider text-zinc-100`}
+          className={`${bebasNeue.className} text-3xl tracking-wider text-zinc-100 sm:text-4xl`}
         >
           Mis Compras
         </h1>

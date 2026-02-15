@@ -95,38 +95,38 @@ export function ProductCard({
       </button>
 
       {/* Info */}
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col p-2.5 sm:p-4">
         <button onClick={onClick} className="text-left cursor-pointer">
-          <p className="text-sm text-zinc-400 line-clamp-1">
+          <p className="text-xs text-zinc-400 line-clamp-1 sm:text-sm">
             {product.features || "Producto"}
           </p>
-          <h3 className="mt-1 text-base font-semibold text-zinc-100 line-clamp-2 group-hover:text-indigo-300 transition-colors">
+          <h3 className="mt-1 text-sm font-semibold text-zinc-100 line-clamp-2 group-hover:text-indigo-300 transition-colors sm:text-base">
             {product.name}
           </h3>
         </button>
         
-        <p className="mt-auto pt-3 text-xl font-bold text-emerald-400">
+        <p className="mt-auto pt-2 text-base font-bold text-emerald-400 sm:pt-3 sm:text-xl">
           {formatCurrency(Number(product.price))}
         </p>
 
         {/* Controles de cantidad y agregar al carrito */}
-        <div className="mt-3 flex items-center gap-1.5">
+        <div className="mt-2 flex flex-col gap-1.5 sm:mt-3 sm:flex-row sm:items-center">
           {/* Selector de cantidad */}
-          <div className="flex items-center rounded-lg border border-zinc-700 bg-zinc-800">
+          <div className="flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800">
             <button
               onClick={handleDecrement}
-              className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors"
+              className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors sm:p-2"
             >
-              <FiMinus className="h-3.5 w-3.5" />
+              <FiMinus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </button>
-            <span className="px-2.5 text-sm font-medium text-zinc-200 min-w-6 text-center">
+            <span className="px-2 text-sm font-medium text-zinc-200 min-w-5 text-center sm:px-2.5 sm:min-w-6">
               {quantity}
             </span>
             <button
               onClick={handleIncrement}
-              className="p-2 text-zinc-400 hover:text-zinc-200 transition-colors"
+              className="p-1.5 text-zinc-400 hover:text-zinc-200 transition-colors sm:p-2"
             >
-              <FiPlus className="h-3.5 w-3.5" />
+              <FiPlus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </button>
           </div>
 
@@ -134,9 +134,9 @@ export function ProductCard({
           <button
             onClick={handleAddToCart}
             disabled={isAdding}
-            className="flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-2.5 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 min-w-0 flex items-center justify-center gap-1 rounded-lg bg-indigo-600 px-2 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed sm:gap-1.5 sm:px-2.5 sm:py-2 sm:text-sm"
           >
-            <FiShoppingCart className="h-4 w-4 shrink-0" />
+            <FiShoppingCart className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
             <span className="truncate">{isAdding ? "..." : "Agregar"}</span>
           </button>
         </div>
@@ -144,9 +144,9 @@ export function ProductCard({
         {/* Botón ver detalles */}
         <button
           onClick={onClick}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+          className="mt-1.5 flex w-full items-center justify-center gap-1.5 rounded-lg border border-zinc-700 px-2 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-zinc-100 sm:mt-2 sm:gap-2 sm:px-4 sm:py-2 sm:text-sm"
         >
-          <FiEye className="h-4 w-4 shrink-0" />
+          <FiEye className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
           <span>Ver detalles</span>
         </button>
       </div>

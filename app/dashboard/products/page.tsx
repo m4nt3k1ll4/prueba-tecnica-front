@@ -23,15 +23,15 @@ export default async function ProductsPage(props: {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1
-          className={`${bebasNeue.className} text-4xl tracking-wider text-zinc-100`}
+          className={`${bebasNeue.className} text-3xl tracking-wider text-zinc-100 sm:text-4xl`}
         >
           Productos
         </h1>
         <Link
           href="/dashboard/products/create"
-          className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 transition-colors"
+          className="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 transition-colors w-full sm:w-auto"
         >
           <FiPlus className="h-4 w-4" />
           <span>Crear producto</span>

@@ -3,6 +3,7 @@
 import { CartProvider } from "@/app/components/CartContext";
 import { CartDrawer } from "@/app/components/CartDrawer";
 import { CartButton } from "@/app/components/CartButton";
+import { AIChatBubble } from "@/app/components/AIChatBubble";
 import { useSession } from "next-auth/react";
 import type { ReactNode } from "react";
 
@@ -18,9 +19,12 @@ export function CartWrapper({ children }: { children: ReactNode }) {
   return (
     <CartProvider>
       {/* Floating cart button */}
-      <div className="fixed bottom-6 right-6 z-30 md:bottom-8 md:right-8">
+      <div className="fixed bottom-4 right-3 z-30 sm:right-6 md:bottom-8 md:right-8">
         <CartButton />
       </div>
+
+      {/* AI Shopping assistant bubble */}
+      <AIChatBubble />
 
       {children}
 

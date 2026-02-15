@@ -17,6 +17,7 @@ export function ProductModal({
   onClose: () => void;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [currentProductId, setCurrentProductId] = useState(product.id);
   const [imageIndex, setImageIndex] = useState(0);
   const [stock, setStock] = useState<Stock | null>(null);
   const [stockLoading, setStockLoading] = useState(true);
@@ -25,9 +26,18 @@ export function ProductModal({
   const { addItem } = useCart();
   const images = product.images && product.images.length > 0 ? product.images : [];
 
-  // Fetch stock info
-  useEffect(() => {
+  // Detect product change and reset state
+  if (currentProductId !== product.id) {
+    setCurrentProductId(product.id);
+    setImageIndex(0);
+    setQuantity(1);
+    setAdded(false);
+    setStock(null);
     setStockLoading(true);
+  }
+
+  // Fetch stock when product changes
+  useEffect(() => {
     fetchStockByProductAction(product.id)
       .then((res) => {
         if (res.success && res.data) {
@@ -74,7 +84,7 @@ export function ProductModal({
       onClick={handleOverlayClick}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
     >
-      <div className="relative w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl flex flex-col">
+      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl flex flex-col sm:max-h-[85vh]">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -93,7 +103,7 @@ export function ProductModal({
                   alt={`${product.name} - imagen ${imageIndex + 1}`}
                   width={400}
                   height={320}
-                  className="max-h-64 md:max-h-72 w-full object-contain p-4 md:p-6"
+                  className="max-h-48 sm:max-h-64 md:max-h-72 w-full object-contain p-4 md:p-6"
                 />
                 {images.length > 1 && (
                   <>
