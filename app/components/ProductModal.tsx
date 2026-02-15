@@ -1,0 +1,253 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+import type { Product, Stock } from "@/app/types";
+import { formatCurrency } from "@/app/helpers/utils";
+import { fetchStockByProductAction } from "@/app/helpers/actions";
+import { useCart } from "@/app/components/CartContext";
+import Image from "next/image";
+import { FiX, FiChevronLeft, FiChevronRight, FiBox, FiZap, FiShoppingCart, FiMinus, FiPlus } from "react-icons/fi";
+
+export function ProductModal({
+  product,
+  onClose,
+}: {
+  product: Product;
+  onClose: () => void;
+}) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [stock, setStock] = useState<Stock | null>(null);
+  const [stockLoading, setStockLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
+  const { addItem } = useCart();
+  const images = product.images && product.images.length > 0 ? product.images : [];
+
+  // Fetch stock info
+  useEffect(() => {
+    setStockLoading(true);
+    fetchStockByProductAction(product.id)
+      .then((res) => {
+        if (res.success && res.data) {
+          setStock(res.data);
+        }
+      })
+      .finally(() => setStockLoading(false));
+  }, [product.id]);
+
+  const maxStock = stock ? stock.stock : 0;
+  const salePrice = stock ? Number(stock.sale_value) : Number(product.price);
+  const inStock = stock ? stock.stock > 0 : false;
+
+  const handleAddToCart = () => {
+    if (!inStock) return;
+    addItem(product, quantity, stock ?? undefined);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
+
+  // Cerrar con Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === overlayRef.current) onClose();
+  };
+
+  const prevImage = () => setImageIndex((i) => (i === 0 ? images.length - 1 : i - 1));
+  const nextImage = () => setImageIndex((i) => (i === images.length - 1 ? 0 : i + 1));
+
+  return createPortal(
+    <div
+      ref={overlayRef}
+      onClick={handleOverlayClick}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+    >
+      <div className="relative w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl flex flex-col">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 z-10 rounded-full bg-zinc-800/80 p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors cursor-pointer"
+        >
+          <FiX className="h-5 w-5" />
+        </button>
+
+        <div className="flex flex-col md:flex-row overflow-y-auto">
+          {/* Image section */}
+          <div className="relative flex items-center justify-center bg-zinc-950 md:w-1/2 rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none">
+            {images.length > 0 ? (
+              <>
+                <Image
+                  src={images[imageIndex]}
+                  alt={`${product.name} - imagen ${imageIndex + 1}`}
+                  width={400}
+                  height={320}
+                  className="max-h-64 md:max-h-72 w-full object-contain p-4 md:p-6"
+                />
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={prevImage}
+                      className="absolute left-2 rounded-full bg-zinc-800/80 p-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <FiChevronLeft className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={nextImage}
+                      className="absolute right-2 rounded-full bg-zinc-800/80 p-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <FiChevronRight className="h-4 w-4" />
+                    </button>
+                    {/* Dots */}
+                    <div className="absolute bottom-2 flex gap-1">
+                      {images.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setImageIndex(i)}
+                          className={`h-1.5 w-1.5 rounded-full transition-colors cursor-pointer ${
+                            i === imageIndex ? "bg-indigo-400" : "bg-zinc-600"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-zinc-600">
+                <FiBox className="h-12 w-12 mb-2" />
+                <span className="text-sm">Sin imágenes</span>
+              </div>
+            )}
+          </div>
+
+          {/* Info section */}
+          <div className="flex-1 p-4 md:p-6 space-y-4">
+            <div>
+              <h2 className="text-xl md:text-2xl font-bold text-zinc-100 leading-tight">{product.name}</h2>
+              <p className="mt-1.5 text-2xl md:text-3xl font-bold text-emerald-400">
+                {formatCurrency(Number(product.price))}
+              </p>
+            </div>
+
+            {product.features && (
+              <div>
+                <h3 className="mb-1 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  Características
+                </h3>
+                <p className="text-sm leading-relaxed text-zinc-300 line-clamp-3">
+                  {product.features}
+                </p>
+              </div>
+            )}
+
+            {product.ai_description && (
+              <div>
+                <h3 className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                  <FiZap className="h-3 w-3 text-indigo-400" />
+                  Descripción IA
+                </h3>
+                <p className="text-sm leading-relaxed text-zinc-300 line-clamp-4">
+                  {product.ai_description}
+                </p>
+              </div>
+            )}
+
+            {/* Thumbnails */}
+            {images.length > 1 && (
+              <div className="flex gap-1.5 pt-1">
+                {images.slice(0, 6).map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setImageIndex(i)}
+                    className={`h-10 w-10 shrink-0 overflow-hidden rounded-md border-2 transition-colors cursor-pointer ${
+                      i === imageIndex
+                        ? "border-indigo-500"
+                        : "border-zinc-700 hover:border-zinc-500"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`Thumb ${i + 1}`}
+                      width={40}
+                      height={40}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
+                {images.length > 6 && (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md border-2 border-zinc-700 text-xs text-zinc-500">
+                    +{images.length - 6}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Stock & Add to Cart */}
+            <div className="border-t border-zinc-800 pt-3 space-y-2.5">
+              {stockLoading ? (
+                <div className="h-9 w-full animate-pulse rounded-lg bg-zinc-800" />
+              ) : inStock ? (
+                <>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-zinc-400">Disponible:</span>
+                    <span className="font-medium text-emerald-400">{maxStock} unidades</span>
+                    {stock && Number(stock.sale_value) !== Number(product.price) && (
+                      <span className="ml-auto text-xs font-medium text-indigo-400">
+                        Precio: {formatCurrency(salePrice)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center rounded-lg border border-zinc-700 bg-zinc-800">
+                      <button
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        className="px-2.5 py-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                      >
+                        <FiMinus className="h-3.5 w-3.5" />
+                      </button>
+                      <span className="min-w-8 text-center text-sm font-medium text-zinc-200">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => setQuantity((q) => Math.min(maxStock, q + 1))}
+                        disabled={quantity >= maxStock}
+                        className="px-2.5 py-1.5 text-zinc-400 hover:text-white transition-colors cursor-pointer disabled:opacity-40"
+                      >
+                        <FiPlus className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={added}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors cursor-pointer disabled:opacity-70"
+                    >
+                      <FiShoppingCart className="h-4 w-4" />
+                      {added ? "¡Agregado!" : "Agregar"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-lg border border-red-900/50 bg-red-900/20 px-3 py-2 text-center text-sm text-red-400">
+                  Sin stock disponible
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
