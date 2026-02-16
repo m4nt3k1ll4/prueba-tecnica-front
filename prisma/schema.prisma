@@ -108,3 +108,20 @@ model VerificationToken {
   @@map("verification_tokens")
   @@schema("public")
 }
+
+model ProductScraping {
+  id               String   @id @default(cuid())
+  productId        Int      @unique @map("product_id") // ID del producto en el backend de Laravel
+  amazonUrl        String   @map("amazon_url") @db.Text
+  amazonTitle      String?  @map("amazon_title") @db.Text
+  amazonPrice      String?  @map("amazon_price")
+  amazonRating     String?  @map("amazon_rating")
+  amazonFeatures   String?  @map("amazon_features") @db.Text // JSON array o texto con viñetas
+  amazonDescription String? @map("amazon_description") @db.Text
+  scrapedAt        DateTime @default(now()) @map("scraped_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("product_scrapings")
+  @@schema("public")
+}

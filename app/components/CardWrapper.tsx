@@ -1,13 +1,18 @@
-import { FiUsers, FiUserCheck, FiUserX, FiKey } from "react-icons/fi";
+import { FiUsers, FiUserCheck, FiUserX, FiKey, FiPackage, FiShoppingCart, FiTrendingUp, FiDatabase } from "react-icons/fi";
 import { fetchStatistics } from "@/app/helpers/api";
 import { auth } from "@/app/auth";
 import { cn } from "@/app/helpers/utils";
+import { prisma } from "@/lib/prisma";
 
 const iconMap = {
   total_users: FiUsers,
   approved_users: FiUserCheck,
   pending_users: FiUserX,
   users_with_api_key: FiKey,
+  total_products: FiPackage,
+  total_purchases: FiShoppingCart,
+  completed_purchases: FiTrendingUp,
+  total_purchase_items: FiDatabase,
 };
 
 export async function CardWrapper() {
@@ -34,28 +39,74 @@ export async function CardWrapper() {
 
   const stats = res.data;
 
+  // Obtener estadísticas adicionales de la base de datos local
+  const [totalPurchases, completedPurchases, totalPurchaseItems] = await Promise.all([
+    prisma.purchase.count(),
+    prisma.purchase.count({ where: { status: "completed" } }),
+    prisma.purchaseItem.count(),
+  ]);
+
+  // Calcular productos únicos en compras
+  const uniqueProducts = await prisma.purchaseItem.findMany({
+    select: { productId: true },
+    distinct: ['productId'],
+  });
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <StatCard
-        title="Total Usuarios"
-        value={stats.total_users}
-        type="total_users"
-      />
-      <StatCard
-        title="Aprobados"
-        value={stats.approved_users}
-        type="approved_users"
-      />
-      <StatCard
-        title="Pendientes"
-        value={stats.pending_users}
-        type="pending_users"
-      />
-      <StatCard
-        title="Con API Key"
-        value={stats.users_with_api_key}
-        type="users_with_api_key"
-      />
+    <div className="space-y-6">
+      {/* Estadísticas de Usuarios */}
+      <div>
+        <h3 className="mb-3 text-sm font-semibold text-zinc-300">Usuarios</h3>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Total Usuarios"
+            value={stats.total_users}
+            type="total_users"
+          />
+          <StatCard
+            title="Aprobados"
+            value={stats.approved_users}
+            type="approved_users"
+          />
+          <StatCard
+            title="Pendientes"
+            value={stats.pending_users}
+            type="pending_users"
+          />
+          <StatCard
+            title="Con API Key"
+            value={stats.users_with_api_key}
+            type="users_with_api_key"
+          />
+        </div>
+      </div>
+
+      {/* Estadísticas de Productos y Ventas */}
+      <div>
+        <h3 className="mb-3 text-sm font-semibold text-zinc-300">Productos & Ventas</h3>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Productos Únicos"
+            value={uniqueProducts.length}
+            type="total_products"
+          />
+          <StatCard
+            title="Total Compras"
+            value={totalPurchases}
+            type="total_purchases"
+          />
+          <StatCard
+            title="Completadas"
+            value={completedPurchases}
+            type="completed_purchases"
+          />
+          <StatCard
+            title="Items Vendidos"
+            value={totalPurchaseItems}
+            type="total_purchase_items"
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -76,6 +127,10 @@ function StatCard({
     approved_users: "text-emerald-400 bg-emerald-400/10",
     pending_users: "text-amber-400 bg-amber-400/10",
     users_with_api_key: "text-violet-400 bg-violet-400/10",
+    total_products: "text-cyan-400 bg-cyan-400/10",
+    total_purchases: "text-indigo-400 bg-indigo-400/10",
+    completed_purchases: "text-emerald-400 bg-emerald-400/10",
+    total_purchase_items: "text-pink-400 bg-pink-400/10",
   };
 
   return (

@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiSave, FiArrowLeft, FiLoader } from "react-icons/fi";
 import type { Product } from "@/app/types";
 import type { ActionState } from "@/app/helpers/actions";
 import { createProductAction, updateProductAction } from "@/app/helpers/actions";
+import { AmazonScraper } from "@/app/components/AmazonScraper";
 
 export function ProductForm({
   product,
@@ -15,6 +16,9 @@ export function ProductForm({
 }) {
   const router = useRouter();
   const isEditing = !!product;
+  const [features, setFeatures] = useState(product?.features || "");
+  const [price, setPrice] = useState(product?.price ? String(Number(product.price)) : "");
+  const [isScrapingAmazon, setIsScrapingAmazon] = useState(false);
 
   const boundAction = isEditing
     ? updateProductAction.bind(null, product.id)
@@ -26,9 +30,11 @@ export function ProductForm({
   );
 
   // Redirect on success for create
-  if (state.success && !isEditing) {
-    router.push("/dashboard/products");
-  }
+  useEffect(() => {
+    if (state.success && !isEditing) {
+      router.push("/dashboard/products");
+    }
+  }, [state.success, isEditing, router]);
 
   return (
     <form action={formAction} className="space-y-6">
@@ -72,9 +78,12 @@ export function ProductForm({
       <div>
         <label
           htmlFor="price"
-          className="mb-1.5 block text-sm font-medium text-zinc-300"
+          className="mb-1.5 flex items-center justify-between text-sm font-medium text-zinc-300"
         >
-          Precio
+          <span>Precio</span>
+          {isScrapingAmazon && (
+            <span className="text-xs text-amber-400">Auto-llenando...</span>
+          )}
         </label>
         <input
           id="price"
@@ -82,7 +91,8 @@ export function ProductForm({
           type="number"
           step="0.01"
           min="0"
-          defaultValue={product?.price ? Number(product.price) : undefined}
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
           className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
           placeholder="0.00"
         />
@@ -95,17 +105,21 @@ export function ProductForm({
       <div>
         <label
           htmlFor="features"
-          className="mb-1.5 block text-sm font-medium text-zinc-300"
+          className="mb-1.5 flex items-center justify-between text-sm font-medium text-zinc-300"
         >
-          Características
+          <span>Características</span>
+          {isScrapingAmazon && (
+            <span className="text-xs text-amber-400">Auto-llenando...</span>
+          )}
         </label>
         <textarea
           id="features"
           name="features"
-          rows={3}
-          defaultValue={product?.features || ""}
+          rows={4}
+          value={features}
+          onChange={(e) => setFeatures(e.target.value)}
           className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors resize-none"
-          placeholder="Describe las características del producto"
+          placeholder="Describe las características del producto (se llenarán automáticamente desde Amazon)"
         />
         {state.errors?.features && (
           <p className="mt-1 text-xs text-red-400">
@@ -136,6 +150,15 @@ export function ProductForm({
           </p>
         )}
       </div>
+
+      {/* Amazon Web Scraper */}
+      <AmazonScraper
+        initialUrl={product?.amazon_url || undefined}
+        initialDescription={product?.amazon_description || undefined}
+        onFeaturesExtracted={setFeatures}
+        onPriceExtracted={setPrice}
+        onScrapingStateChange={setIsScrapingAmazon}
+      />
 
       {/* Actions */}
       <div className="flex items-center gap-3 pt-2">

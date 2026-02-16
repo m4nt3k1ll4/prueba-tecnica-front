@@ -126,6 +126,8 @@ export interface Product {
   price: string;
   ai_description: string | null;
   images: string[] | null;
+  amazon_url: string | null;
+  amazon_description: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -136,6 +138,8 @@ export interface CreateProductRequest {
   price?: number;
   ai_description?: string;
   images?: string[];
+  amazon_url?: string;
+  amazon_description?: string;
 }
 
 export interface UpdateProductRequest {
@@ -144,6 +148,8 @@ export interface UpdateProductRequest {
   price?: number;
   ai_description?: string;
   images?: string[];
+  amazon_url?: string;
+  amazon_description?: string;
 }
 
 export interface ProductListResponse {

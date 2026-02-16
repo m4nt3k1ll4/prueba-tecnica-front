@@ -63,6 +63,7 @@ export async function createProductAction(
   const features = formData.get("features") as string;
   const priceStr = formData.get("price") as string;
   const ai_description = formData.get("ai_description") as string;
+  // amazon_url y amazon_description son solo demostrativos (no se procesan)
 
   if (!name || name.trim().length < 2) {
     return { success: false, message: "El nombre es obligatorio (mínimo 2 caracteres)." };
@@ -73,6 +74,9 @@ export async function createProductAction(
     return { success: false, message: "El precio debe ser un número positivo." };
   }
 
+  // Nota: amazon_url y amazon_description son solo para demostración (web scraping)
+  // No se envían al backend
+  
   const res = await apiCreateProduct({
     name: name.trim(),
     features: features?.trim() || undefined,
@@ -97,6 +101,7 @@ export async function updateProductAction(
   const features = formData.get("features") as string;
   const priceStr = formData.get("price") as string;
   const ai_description = formData.get("ai_description") as string;
+  // amazon_url y amazon_description son solo demostrativos (no se procesan)
 
   if (!name || name.trim().length < 2) {
     return { success: false, message: "El nombre es obligatorio (mínimo 2 caracteres)." };
@@ -107,6 +112,9 @@ export async function updateProductAction(
     return { success: false, message: "El precio debe ser un número positivo." };
   }
 
+  // Nota: amazon_url y amazon_description son solo para demostración (web scraping)
+  // No se envían al backend
+  
   const res = await apiUpdateProduct(id, {
     name: name.trim(),
     features: features?.trim() || undefined,

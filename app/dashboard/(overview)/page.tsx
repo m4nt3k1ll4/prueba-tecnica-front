@@ -3,6 +3,7 @@ import { auth } from "@/app/auth";
 import { redirect } from "next/navigation";
 import { bebasNeue } from "@/app/ui/fonts";
 import { CardWrapper } from "@/app/components/CardWrapper";
+import { DashboardMetrics } from "@/app/components/DashboardMetrics";
 import { CardsSkeleton } from "@/app/components/Skeletons";
 import { LatestProducts } from "@/app/components/LatestProducts";
 
@@ -31,6 +32,16 @@ export default async function DashboardPage() {
       <Suspense fallback={<CardsSkeleton />}>
         <CardWrapper />
       </Suspense>
+
+      {/* Métricas Adicionales */}
+      <div>
+        <h2 className="mb-4 text-lg font-semibold text-zinc-200">
+          Métricas de Actividad
+        </h2>
+        <Suspense fallback={<div className="grid gap-4 sm:grid-cols-3"><div className="h-32 animate-pulse rounded-xl bg-zinc-900 border border-zinc-800" /><div className="h-32 animate-pulse rounded-xl bg-zinc-900 border border-zinc-800" /><div className="h-32 animate-pulse rounded-xl bg-zinc-900 border border-zinc-800" /></div>}>
+          <DashboardMetrics />
+        </Suspense>
+      </div>
 
       {/* Latest Products */}
       <div>
