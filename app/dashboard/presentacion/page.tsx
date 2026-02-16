@@ -32,23 +32,23 @@ const infraestructura = [
   {
     icon: FiGlobe,
     servicio: "Vercel",
-    rol: "Frontend (Next.js)",
+    rol: "Frontend (Next.js 16)",
     descripcion:
-      "Hosting del frontend con despliegue automático desde GitHub. Vercel es la plataforma nativa de Next.js y ofrece edge functions, ISR (Incremental Static Regeneration) y previews por branch.",
+      "Hosting del frontend con despliegue automático desde GitHub. Implementa Server Components, Server Actions, streaming SSR, ISR (Incremental Static Regeneration) con revalidación inteligente cada 30-60 segundos, y edge functions para máximo rendimiento global.",
   },
   {
     icon: FiServer,
     servicio: "Railway",
-    rol: "Backend (Laravel)",
+    rol: "Backend API (Laravel 12)",
     descripcion:
-      "Hosting del backend PHP/Laravel con base de datos MySQL integrada. Railway permite desplegar aplicaciones con su propia base de datos relacional, ideal para la API REST con Sanctum.",
+      "Hosting del backend PHP/Laravel con base de datos MySQL integrada. Gestiona toda la lógica de negocio: productos, inventario, ventas, usuarios, roles y autenticación de la API REST con Sanctum. Incluye middleware de autorización por rol y generación IA con Google Gemini.",
   },
   {
     icon: FiDatabase,
     servicio: "Supabase",
-    rol: "Base de datos del Frontend (PostgreSQL)",
+    rol: "Base de datos Frontend (PostgreSQL)",
     descripcion:
-      "Base de datos PostgreSQL para el frontend con Prisma ORM. Supabase ofrece una capa gestionada de Postgres que se integra nativamente con NextAuth.js para sesiones, cuentas OAuth y datos de usuario.",
+      "Base de datos PostgreSQL gestionada para el frontend con Prisma ORM. Almacena sesiones de NextAuth.js, cuentas OAuth (Google), tokens JWT, historial de compras del usuario y carrito de compras. Integración nativa con NextAuth.js para autenticación multi-proveedor.",
   },
 ];
 
@@ -56,24 +56,29 @@ const infraestructura = [
 
 const decisiones = [
   {
-    pregunta: "¿Por qué dos bases de datos?",
+    pregunta: "¿Por qué arquitectura dual-database?",
     respuesta:
-      "El backend Laravel (Railway+Supabase) gestiona la lógica de negocio: productos, stock, ventas, roles y autenticación de la API. El frontend Next.js necesita su propia persistencia (Supabase/PostgreSQL) para NextAuth.js (sesiones, cuentas OAuth, tokens JWT) y para almacenar datos exclusivos del frontend como compras del carrito. Separar ambas permite que cada capa evolucione de forma independiente: si se cambia el backend, el frontend mantiene su autenticación intacta y viceversa.",
+      "El backend Laravel (Railway + MySQL) gestiona el core del negocio: productos, stock, ventas, roles y autenticación de la API REST. El frontend Next.js mantiene su propia base de datos en Supabase (PostgreSQL) para NextAuth.js: sesiones, cuentas OAuth de Google, tokens JWT y datos específicos del frontend como el historial de compras y carrito. Esta separación permite evolución independiente, escalabilidad horizontal y desacoplamiento total entre capas.",
   },
   {
-    pregunta: "¿Por qué Next.js + Laravel en lugar de un monolito?",
+    pregunta: "¿Por qué Next.js + Laravel desacoplados?",
     respuesta:
-      "La arquitectura desacoplada permite que el frontend use Server Components y Server Actions de Next.js para rendimiento óptimo (SSR, ISR, streaming), mientras que el backend Laravel se enfoca exclusivamente en la API REST, validación de negocio y generación de IA. Esto simula un entorno real de trabajo donde frontend y backend son equipos/repos independientes.",
+      "La arquitectura desacoplada maximiza las ventajas de ambos frameworks: Next.js 16 usa Server Components, Server Actions, streaming SSR e ISR para rendimiento óptimo; Laravel 12 se enfoca exclusivamente en la API REST, validación de negocio, protección con Sanctum y generación IA con Gemini. Simula un entorno de producción real con equipos frontend/backend independientes y permite deploy separado.",
   },
   {
-    pregunta: "¿Por qué NextAuth.js + Sanctum en lugar de un solo sistema?",
+    pregunta: "¿Por qué NextAuth.js + Sanctum?",
     respuesta:
-      "NextAuth.js maneja la autenticación del frontend (Google OAuth, sesiones JWT, refresh tokens) de forma nativa en Next.js. Sanctum protege la API Laravel con tokens que expiran en 5 minutos. La combinación permite multi-proveedor (Google para usuarios, credenciales para admin/entrevistador) sin acoplar el frontend a Laravel.",
+      "NextAuth.js 4.0 gestiona la autenticación del frontend: Google OAuth para usuarios finales, credenciales para admin/entrevistador, sesiones JWT y refresh automático de tokens. Sanctum protege la API Laravel con tokens de corta duración (5 minutos) y middleware de autorización por rol. Esta combinación permite multi-proveedor robusto sin acoplar el frontend al backend de autenticación.",
   },
   {
-    pregunta: "¿Por qué Prisma y no solo Eloquent?",
+    pregunta: "¿Por qué Prisma y Eloquent?",
     respuesta:
-      "Prisma es el ORM estándar del ecosistema Node.js/TypeScript. Nos da tipado completo end-to-end, migraciones declarativas y una API de queries type-safe que se integra perfectamente con Server Components. Eloquent sigue siendo el ORM del backend Laravel. Cada capa usa el ORM idóneo para su ecosistema.",
+      "Cada ORM es idóneo para su ecosistema: Prisma en Node.js/TypeScript ofrece tipado end-to-end completo, migraciones declarativas, queries type-safe y generación automática de tipos para Server Components. Eloquent en Laravel proporciona un ORM maduro, fluido y eficiente para la API REST con relaciones, scopes y mutators. Usar el mejor ORM de cada stack maximiza la productividad y la calidad del código.",
+  },
+  {
+    pregunta: "¿Cómo funciona la sincronización entre bases de datos?",
+    respuesta:
+      "No hay sincronización directa - cada base de datos tiene responsabilidades claras. El frontend consulta la API Laravel para productos, stock y ventas (datos de negocio). El backend no conoce las sesiones de NextAuth ni el carrito del usuario. El ID de usuario se envía en cada request autenticado para vincular compras. Esta arquitectura evita estados duplicados y mantiene una única fuente de verdad para cada dominio.",
   },
 ];
 
@@ -107,40 +112,46 @@ const indicaciones = [
 const integraciones = [
   {
     icon: FiCpu,
-    nombre: "Google Gemini API",
-    descripcion: "Generación de descripciones de productos con IA generativa desde el backend Laravel.",
+    nombre: "Google Gemini AI",
+    descripcion: "Generación automática de descripciones de productos con IA generativa. El backend Laravel envía prompts optimizados a Gemini y procesa las respuestas para crear descripciones de marketing atractivas y precisas.",
   },
   {
     icon: FiDatabase,
-    nombre: "Dual Database (Prisma + Eloquent)",
+    nombre: "Dual Database",
     descripcion:
-      "Prisma ORM → Supabase (PostgreSQL) para el frontend. Eloquent ORM → Railway (MySQL) para el backend. Sincronizados vía API REST.",
+      "Prisma ORM + Supabase PostgreSQL para frontend (NextAuth, sesiones, carrito). Eloquent ORM + Railway MySQL para backend (productos, stock, ventas, usuarios). Comunicación vía API REST autenticada.",
   },
   {
     icon: FiCode,
-    nombre: "NextAuth.js v5 + Sanctum",
+    nombre: "NextAuth.js 4.0 + Sanctum",
     descripcion:
-      "Autenticación multi-proveedor: Google OAuth para usuarios, credenciales para admin/entrevistador, Sanctum para proteger la API.",
+      "Autenticación híbrida: NextAuth 4.0 para Google OAuth y credenciales en el frontend, Sanctum para proteger la API Laravel. Tokens JWT con refresh automático cada 5 minutos. Middleware de autorización por rol en ambas capas.",
   },
   {
     icon: FiLock,
-    nombre: "Roles y Permisos",
+    nombre: "Sistema de Roles",
     descripcion:
-      "Sistema de 3 roles (admin, client, interviewer) con middleware en Laravel y sesiones JWT en NextAuth. El token de admin/interviewer expira cada 5 min y se refresca automáticamente.",
+      "3 roles con permisos granulares: admin (acceso total), client (catálogo y compras), interviewer (visualización completa). Middleware en Laravel valida roles en API. NextAuth maneja permisos en rutas protegidas del frontend.",
   },
 ];
 
 const proyectoHighlights = [
-  "CRUD completo de productos con generación IA de descripciones",
-  "Gestión de inventario/stock con KPIs en tiempo real",
-  "Catálogo público con carrito de compras y historial",
-  "Panel de administración con gestión de usuarios y ventas",
-  "Rol de entrevistador con zona protegida de presentación",
-  "Arquitectura dual-database (Prisma + Eloquent)",
-  "Caching optimizado con Next.js ISR (revalidate 30-60s)",
-  "Autenticación multi-rol con refresh automático de tokens",
-  "Asignación de roles desde el panel de admin",
-  "Despliegue en producción: Vercel + Railway + Supabase",
+  "CRUD completo de productos con generación IA de descripciones (Google Gemini)",
+  "Gestión de inventario/stock con KPIs en tiempo real y alertas de bajo stock",
+  "Catálogo público con buscador, paginación, carrito de compras y modal de detalle",
+  "Panel de administración: usuarios (pending/active), ventas, stock, productos",
+  "Scraper de Amazon integrado para importación rápida de productos",
+  "Rol de entrevistador con zona exclusiva de presentación técnica",
+  "Arquitectura dual-database desacoplada (PostgreSQL + MySQL)",
+  "Caching optimizado con Next.js ISR (revalidate 30-60s) y Server Components",
+  "Autenticación multi-proveedor (Google OAuth + credenciales) con JWT",
+  "Refresh automático de tokens cada 5 minutos con componente TokenRefresher",
+  "Asignación dinámica de roles desde el panel de admin (client/interviewer)",
+  "Aprobación manual de usuarios registrados antes de acceder (pending users)",
+  "Historial de compras personalizado por usuario con detalle de productos",
+  "Despliegue en producción: Vercel (frontend) + Railway (backend) + Supabase (DB)",
+  "Diseño responsive con Tailwind CSS y modo oscuro nativo",
+  "Middleware de protección de rutas en Next.js y Laravel",
 ];
 
 /* ─── Datos personales ─── */
@@ -258,7 +269,7 @@ export default async function PresentacionPage() {
           Presentación del Proyecto
         </h1>
         <p className="mt-2 text-zinc-400">
-          Arquitectura, decisiones técnicas, infraestructura y documentación completa.
+          Sistema de comercio electrónico full-stack con arquitectura dual-database. Frontend en Next.js con Server Components y autenticación multi-proveedor, backend en Laravel con API RESTful protegida con Sanctum, integración con IA generativa para descripciones de productos y sistema de roles avanzado.
         </p>
       </div>
 
